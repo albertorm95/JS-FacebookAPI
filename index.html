@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Photo Uploader</title>
+	<link rel="stylesheet" type="text/css" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+</head>
+<body>
+	<script>
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId      : '116420065598224',
+				xfbml      : true,
+				version    : 'v2.9'
+			});
+
+			FB.getLoginStatus(function(response) {
+				console.log(response);
+			});
+		};
+
+		(function(d, s, id){
+			 var js, fjs = d.getElementsByTagName(s)[0];
+			 if (d.getElementById(id)) {return;}
+			 js = d.createElement(s); js.id = id;
+			 js.src = "//connect.facebook.net/en_US/sdk.js";
+			 fjs.parentNode.insertBefore(js, fjs);
+		 }(document, 'script', 'facebook-jssdk'));
+
+		function myFacebookLogin() {
+			FB.login(function(response){
+				if(response.authResponse){
+					console.log("Logged in!");
+					FB.api('me', function(response){
+						console.log("Bienvenido, " + response.name + ".");
+					});
+				}
+				else {
+					console.log("Error");
+				}
+			}, {scope: ['publish_actions','user_photos']});
+		};
+
+		function myFacebookLogout() {
+			FB.logout(function(response){
+				console.log("Logged out!");
+				console.log("Logged out!");
+			});
+		};
+
+		function createAlbum(form){
+			var album = {
+				name : form.name.value,
+				location : form.location.value,
+				message : form.message.value
+			};
+			FB.api('/me/albums', 'post', album, function(response) {
+				if (!response || response.error) {
+					console.log('Error occured');
+				} else {
+					console.log('Album: ' + form.name.value + ' created.\nPost ID: ' + response.id);
+				}
+			});
+		};
+
+		function albums(){
+			FB.api('', 'get', function(response){
+				console.log(response);
+			});
+		};
+
+		function loginStatus(){
+			FB.getLoginStatus(function(response) {
+				console.log(response);
+			});
+		};
+
+		// http://www.lessons4living.com/images/penclchk.gif
+		// 10213086456785908
+		function uploadPhoto(form){
+			console.log(form.src.value);
+			var photoSRC = {
+				"source" : form.src.value
+			};
+			var photoURL = {
+				"url" : form.url.value
+			};
+			FB.api('/' + form.albumID.value + '/photos', 'post', photoSRC, function(response){
+				if (response && !response.error) {
+					console.log('Photo uploaded.');
+				} else {
+					console.log(response);
+					console.log("Error");
+				}
+			});
+		};
+
+	</script>
+<div class="container">
+	<div class="row">
+		<div class="col-md-4">
+			<br>
+			<button class="btn-primary" onclick="myFacebookLogin()">Login with Facebook</button>
+			<br>
+			<br>
+			<button class="btn-danger" onclick="myFacebookLogout()">Logout</button>
+			<br>
+			<br>
+			<button class="btn-info" onclick="loginStatus()">Check</button>
+		</div>
+		<div class="col-md-8">
+			<form onsubmit="createAlbum(this);return false">
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="name" value="" placeholder="Nombre">
+				</div>
+				<br>
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="location" value="" placeholder="Lugar">
+				</div>
+				<br>
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="message" value="" placeholder="Descripcion">
+				</div>
+				<br>
+				<div class="input-group">
+					<button class="btn btn-primary" type="submit">Create Album</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-md-6">
+			<p>10213086791954287</p>
+
+			<form onclick="javascript:uploadPhoto();" enctype="multipart/form-data" method="post">
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="file" name="src" value="" placeholder="SRC">
+				</div>
+				<br>
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="albumID" value="10213086791954287" placeholder="Album ID">
+				</div>
+				<br>
+				<br>
+				<div class="input-group">
+					<button class="btn btn-primary" type="submit">Publish Photo 'src'</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="col-md-6">
+			<form onsubmit="uploadPhoto(this);return false;">
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="url" value="" placeholder="URL">
+				</div>
+				<br>
+				<div class="input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+					</span>
+					<input class="form-control" type="text" name="albumID" value="" placeholder="Album ID">
+				</div>
+				<br>
+				<br>
+				<div class="input-group">
+					<button class="btn btn-primary" type="submit">Publish Photo 'url'</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+</html>
